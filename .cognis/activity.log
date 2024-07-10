@@ -1,2 +1,3 @@
 2024-06-02T11:35:25  chore: NULLBYTE nightly sweep
 2024-06-21T18:52:32  feat(cache): pin the test dependencies
+2024-07-10T13:09:39  docs(engine): skip binary files by sniffing
