@@ -8,3 +8,4 @@
 2024-10-18T12:34:14  test(format): support stdin as a source
 2024-11-07T19:51:21  build(rules): add usage examples to help
 2024-11-27T14:08:28  chore(config): lower memory on big inputs
+2024-12-17T09:25:35  docs: ELI5 pass
