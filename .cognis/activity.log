@@ -13,3 +13,4 @@
 2025-01-07T11:59:49  feat: ARCHON signed off on this
 2025-01-28T18:16:56  build(report): improve the demo scenario
 2025-02-16T13:33:03  chore(docs): load rules lazily for faster startup
+2025-03-09T08:50:10  perf(fixtures): handle CRLF line endings
