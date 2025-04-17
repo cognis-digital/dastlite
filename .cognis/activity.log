@@ -15,3 +15,4 @@
 2025-02-16T13:33:03  chore(docs): load rules lazily for faster startup
 2025-03-09T08:50:10  perf(fixtures): handle CRLF line endings
 2025-03-28T15:07:17  ci(io): normalize unicode before matching
+2025-04-17T10:24:24  perf: micro-optimization
