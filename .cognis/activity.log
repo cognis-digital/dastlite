@@ -17,3 +17,4 @@
 2025-03-28T15:07:17  ci(io): normalize unicode before matching
 2025-04-17T10:24:24  perf: micro-optimization
 2025-05-07T17:41:31  docs(cache): pin the test dependencies
+2025-05-26T12:58:38  test(engine): skip binary files by sniffing
