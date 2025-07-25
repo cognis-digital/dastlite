@@ -20,3 +20,4 @@
 2025-05-26T12:58:38  test(engine): skip binary files by sniffing
 2025-06-16T19:15:45  ci(ci): memoize repeated lookups
 2025-07-05T14:32:52  fix(scoring): handle empty and malformed input
+2025-07-25T09:49:59  refactor: future me will understand this
