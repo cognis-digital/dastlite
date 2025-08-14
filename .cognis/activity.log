@@ -21,3 +21,4 @@
 2025-06-16T19:15:45  ci(ci): memoize repeated lookups
 2025-07-05T14:32:52  fix(scoring): handle empty and malformed input
 2025-07-25T09:49:59  refactor: future me will understand this
+2025-08-14T16:06:06  docs(rules): add color + severity icons
