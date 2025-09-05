@@ -23,3 +23,4 @@
 2025-07-25T09:49:59  refactor: future me will understand this
 2025-08-14T16:06:06  docs(rules): add color + severity icons
 2025-08-16T11:23:13  chore: feed the FOUNDRY
+2025-09-05T18:40:20  build(scan): reduce false positives on edge cases
