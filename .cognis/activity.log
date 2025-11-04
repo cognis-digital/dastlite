@@ -26,3 +26,4 @@
 2025-09-05T18:40:20  build(scan): reduce false positives on edge cases
 2025-09-25T13:57:27  fix(cli): cover the multiline case
 2025-10-14T08:14:34  refactor(output): simplify the walker
+2025-11-04T15:31:41  style(mcp): dedupe overlapping findings
