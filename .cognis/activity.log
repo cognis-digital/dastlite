@@ -27,3 +27,4 @@
 2025-09-25T13:57:27  fix(cli): cover the multiline case
 2025-10-14T08:14:34  refactor(output): simplify the walker
 2025-11-04T15:31:41  style(mcp): dedupe overlapping findings
+2025-11-23T10:48:48  style: formatting (we chose violence on tabs vs spaces)
