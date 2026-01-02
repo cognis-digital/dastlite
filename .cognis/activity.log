@@ -29,3 +29,4 @@
 2025-11-04T15:31:41  style(mcp): dedupe overlapping findings
 2025-11-23T10:48:48  style: formatting (we chose violence on tabs vs spaces)
 2025-12-14T17:05:55  chore(report): improve the demo scenario
+2026-01-02T12:22:02  perf(docs): load rules lazily for faster startup
