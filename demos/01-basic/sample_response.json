@@ -1,0 +1,12 @@
+{
+  "url": "https://demo.insecure.example/login",
+  "status": 200,
+  "headers": {
+    "Content-Type": "text/html",
+    "Server": "Apache/2.4.49",
+    "X-Powered-By": "PHP/7.2.1",
+    "Set-Cookie": "session=abc123def456; Path=/",
+    "Cache-Control": "max-age=3600"
+  },
+  "body": "<!DOCTYPE html><html><head><title>Login</title><script src=\"http://cdn.insecure.example/app.js\"></script></head><body><h1>Sign in</h1><!-- debug --> Traceback (most recent call last): File app.py line 42 KeyError config aws_key=AKIAIOSFODNN7EXAMPLE </body></html>"
+}
