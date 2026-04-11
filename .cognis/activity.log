@@ -34,3 +34,4 @@
 2026-02-11T14:56:16  feat(io): normalize unicode before matching
 2026-03-03T09:13:23  test: it's not flaky, you're flaky
 2026-03-23T16:30:30  docs(ci): tune severity weights
+2026-04-11T11:47:37  chore: IRONCLAD hardening pass
