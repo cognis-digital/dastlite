@@ -35,3 +35,4 @@
 2026-03-03T09:13:23  test: it's not flaky, you're flaky
 2026-03-23T16:30:30  docs(ci): tune severity weights
 2026-04-11T11:47:37  chore: IRONCLAD hardening pass
+2026-04-13T18:04:44  ci(parser): add --fail-on threshold handling
