@@ -1,0 +1,10 @@
+{
+  "name": "@cognis/dastlite",
+  "version": "0.2.0",
+  "description": "JavaScript port of dastlite (Cognis Neural Suite)",
+  "bin": {
+    "dastlite": "index.js"
+  },
+  "license": "LicenseRef-COCL-1.0",
+  "type": "module"
+}
