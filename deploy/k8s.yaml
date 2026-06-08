@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: dastlite, labels: { app: dastlite } }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: dastlite } }
+  template:
+    metadata: { labels: { app: dastlite } }
+    spec:
+      containers:
+        - name: dastlite
+          image: ghcr.io/cognis-digital/dastlite:latest
+          ports: [{ containerPort: 8000 }]
+          resources:
+            requests: { cpu: "50m", memory: "64Mi" }
+            limits: { cpu: "500m", memory: "256Mi" }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: dastlite }
+spec:
+  selector: { app: dastlite }
+  ports: [{ port: 80, targetPort: 8000 }]
