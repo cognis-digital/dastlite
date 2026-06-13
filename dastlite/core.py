@@ -6,7 +6,6 @@ with no network. ``fetch`` and ``scan_targets`` add the live HTTP layer.
 """
 from __future__ import annotations
 
-import json
 import re
 import ssl
 import urllib.error
