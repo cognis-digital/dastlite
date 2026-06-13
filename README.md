@@ -20,6 +20,35 @@ pip install cognis-dastlite
 dastlite scan .            # → prioritized findings in seconds
 ```
 
+## Usage — step by step
+
+1. **Install** the scanner:
+
+   ```bash
+   pip install cognis-dastlite
+   ```
+
+2. **Scan URLs** directly, or feed a targets file (one URL per line, `#` comments allowed):
+
+   ```bash
+   dastlite scan https://example.com https://example.org
+   dastlite scan --targets urls.txt
+   ```
+
+3. **Emit SARIF** for GitHub code scanning, or JSON for `jq`:
+
+   ```bash
+   dastlite scan --targets urls.txt --format sarif -o results.sarif
+   ```
+
+4. **Read the result.** The table lists each finding's level (error/warning/note), rule, URL, and evidence, plus a per-target summary. `--fail-on {error,warning,note,never}` controls the gate; exit `0` = clean, `1` = findings at/above threshold, `2` = input error.
+
+5. **Gate a PR.** Fail the build on warnings or worse:
+
+   ```bash
+   dastlite scan --targets urls.txt --fail-on warning --format sarif -o out.sarif
+   ```
+
 ## Contents
 
 - [Why dastlite?](#why) · [Features](#features) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
