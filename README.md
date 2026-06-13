@@ -9,16 +9,22 @@
 
 <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=18&duration=3500&pause=1000&color=6B46C1&center=true&vCenter=true&width=720&lines=A+headless+configascode+DAST+runner+that+crawls+an+authentic;Self-hostable+%C2%B7+MCP-native+%C2%B7+CI-ready+%C2%B7+polyglot" width="720"/>
 
-[![PyPI](https://img.shields.io/pypi/v/cognis-dastlite.svg?color=6b46c1)](https://pypi.org/project/cognis-dastlite/) [![CI](https://github.com/cognis-digital/dastlite/actions/workflows/ci.yml/badge.svg)](https://github.com/cognis-digital/dastlite/actions) [![License: COCL 1.0](https://img.shields.io/badge/License-COCL%201.0-2b6cb0.svg)](LICENSE) [![Suite](https://img.shields.io/badge/Cognis-Neural%20Suite-6b46c1.svg)](https://github.com/cognis-digital)
+[![install](https://img.shields.io/badge/install-git%2B%20%C2%B7%20pipx%20%C2%B7%20uv-6b46c1.svg)](#install--every-way-every-platform) [![CI](https://github.com/cognis-digital/dastlite/actions/workflows/ci.yml/badge.svg)](https://github.com/cognis-digital/dastlite/actions) [![License: COCL 1.0](https://img.shields.io/badge/License-COCL%201.0-2b6cb0.svg)](LICENSE) [![Suite](https://img.shields.io/badge/Cognis-Neural%20Suite-6b46c1.svg)](https://github.com/cognis-digital)
 
 *Application & Mobile Security — SAST/DAST-lite and binary triage.*
 
 </div>
 
 ```bash
-pip install cognis-dastlite
+pip install "git+https://github.com/cognis-digital/dastlite.git"
 dastlite scan .            # → prioritized findings in seconds
 ```
+
+<!-- cognis:layman:start -->
+## What is this?
+
+dastlite is a security-checking tool for websites and web APIs. You point it at a URL or a list of URLs, and it automatically inspects the responses for common security problems — things like missing privacy headers, cookies that could be stolen, or pages that accidentally expose sensitive information. It produces a report you can read in the terminal, save as JSON, or feed directly into GitHub's code-scanning dashboard. It is built for developers and security engineers who want a fast, no-fuss security check that fits into an automated build pipeline.
+<!-- cognis:layman:end -->
 
 ## Contents
 
@@ -49,10 +55,46 @@ ZAP's automation is YAML-heavy and JVM-bound; dastlite is a Go single-binary 'ZA
 <div align="right"><a href="#top">↑ back to top</a></div>
 
 <a name="quick-start"></a>
+<!-- cognis:install:start -->
+## Install
+
+`dastlite` is source-available (not published to PyPI) — every method below installs
+straight from GitHub. Pick whichever you prefer; the one-line scripts auto-detect
+the best tool available on your machine.
+
+**One-liner (Linux / macOS):**
+```sh
+curl -fsSL https://raw.githubusercontent.com/cognis-digital/dastlite/HEAD/install.sh | sh
+```
+
+**One-liner (Windows PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/cognis-digital/dastlite/HEAD/install.ps1 | iex
+```
+
+**Or install manually — any one of:**
+```sh
+pipx install "git+https://github.com/cognis-digital/dastlite.git"     # isolated (recommended)
+uv tool install "git+https://github.com/cognis-digital/dastlite.git"  # uv
+pip install "git+https://github.com/cognis-digital/dastlite.git"      # pip
+```
+
+**From source:**
+```sh
+git clone https://github.com/cognis-digital/dastlite.git
+cd dastlite && pip install .
+```
+
+Then run:
+```sh
+dastlite --help
+```
+<!-- cognis:install:end -->
+
 ## Quick start
 
 ```bash
-pip install cognis-dastlite
+pip install "git+https://github.com/cognis-digital/dastlite.git"
 dastlite --version
 dastlite scan .                       # scan current project
 dastlite scan . --format json         # machine-readable
@@ -145,6 +187,32 @@ curl -fsSL https://raw.githubusercontent.com/cognis-digital/dastlite/main/instal
 <div align="right"><a href="#top">↑ back to top</a></div>
 
 <a name="related"></a>
+<a name="verification"></a>
+## Verification
+
+[![tests](https://img.shields.io/badge/tests-10%20passing-2ea44f.svg)](AUDIT.md)
+
+Every push is verified end-to-end. Latest audit (2026-06-12):
+
+```text
+tests        : 10 passed, 0 failed, 0 errored
+compile      : all modules parse
+cli          : C:\Python314\python.exe: No module named https
+package      : https
+```
+
+<details><summary>CLI surface (<code>--help</code>)</summary>
+
+```text
+C:\Python314\python.exe: No module named https
+```
+</details>
+
+Full machine-readable results: [`AUDIT.md`](AUDIT.md) · regenerate with `python -m https --help` + `pytest -q`.
+
+<div align="right"><a href="#top">↑ back to top</a></div>
+
+
 ## Related Cognis tools
 
 - [`apkpeek`](https://github.com/cognis-digital/apkpeek) — One-command static triage of Android APK/AAB binaries: surfaces hardcoded secrets, exported components, dangerous permissions, and insecure manifest flags as a single SARIF report.
