@@ -34,3 +34,6 @@ dastlite = "dastlite.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["dastlite"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
