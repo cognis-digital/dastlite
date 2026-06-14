@@ -1,6 +1,10 @@
 """DASTLITE MCP server — exposes scan() as an MCP tool for Cognis.Studio."""
 from __future__ import annotations
-from dastlite.core import scan, to_json
+
+import json
+
+from dastlite.core import scan_targets, to_json
+
 
 def serve() -> int:
     """Start an MCP stdio server. Requires the optional 'mcp' extra:
@@ -15,8 +19,11 @@ def serve() -> int:
 
     @app.tool()
     def dastlite_scan(target: str) -> str:
-        """A headless, config-as-code DAST runner that crawls an authenticated web/mobile-API surface and fires a curated active-scan ruleset, emitting deduplicated SARIF.. Returns JSON findings."""
-        return to_json(scan(target))
+        """Scan a single URL with passive DAST checks and return JSON findings."""
+        if not target or not target.strip():
+            return json.dumps({"error": "target URL must not be empty"})
+        result = scan_targets([target.strip()])
+        return json.dumps(to_json(result))
 
     app.run()
     return 0

@@ -30,7 +30,11 @@ from . import TOOL_NAME, TOOL_VERSION
 from .core import scan_targets, to_sarif, to_json, severity_rank
 
 
-def _load_targets(args) -> list:
+_TARGETS_IO_ERROR = object()  # sentinel: file error, not just empty
+
+
+def _load_targets(args):
+    """Return a list of URL strings, or ``_TARGETS_IO_ERROR`` on file I/O failure."""
     urls = list(args.urls or [])
     if args.targets:
         try:
@@ -41,7 +45,7 @@ def _load_targets(args) -> list:
                         urls.append(line)
         except OSError as e:
             print(f"error: cannot read targets file: {e}", file=sys.stderr)
-            return []
+            return _TARGETS_IO_ERROR
     return urls
 
 
@@ -95,6 +99,17 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: Optional[list] = None) -> int:
+    try:
+        return _main(argv)
+    except KeyboardInterrupt:
+        print("\nerror: interrupted", file=sys.stderr)
+        return 2
+    except Exception as exc:  # pragma: no cover — safety net for unexpected bugs
+        print(f"error: unexpected failure: {exc}", file=sys.stderr)
+        return 2
+
+
+def _main(argv: Optional[list] = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 
@@ -102,7 +117,14 @@ def main(argv: Optional[list] = None) -> int:
         parser.print_help()
         return 0
 
+    # Validate --timeout early so the user gets a clear message.
+    if args.timeout <= 0:
+        print("error: --timeout must be a positive number", file=sys.stderr)
+        return 2
+
     urls = _load_targets(args)
+    if urls is _TARGETS_IO_ERROR:
+        return 2
     if not urls:
         print("error: no targets given. Pass URLs or --targets FILE.", file=sys.stderr)
         return 2

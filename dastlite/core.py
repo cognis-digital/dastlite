@@ -238,7 +238,9 @@ def run_passive_checks(target: Target, checks: Optional[Iterable] = None) -> lis
 
 def scan_response(url: str, status: int, headers: dict, body: str = "") -> list:
     """Convenience wrapper: build a Target and run all passive checks."""
-    return run_passive_checks(Target(url=url, status=status, headers=dict(headers), body=body))
+    if headers is None:
+        headers = {}
+    return run_passive_checks(Target(url=url, status=status, headers=dict(headers), body=body or ""))
 
 
 # --------------------------------------------------------------------------
@@ -252,6 +254,11 @@ def fetch(url: str, timeout: float = 10.0, max_body: int = 200_000,
     Network errors are captured on ``Target.error`` rather than raised, so a
     single dead URL does not abort the whole scan.
     """
+    if not isinstance(url, str) or not url.strip():
+        return Target(url=str(url), error="invalid URL: must be a non-empty string")
+    scheme = url.split("://", 1)[0].lower() if "://" in url else ""
+    if scheme not in ("http", "https"):
+        return Target(url=url, error=f"invalid URL scheme '{scheme}': only http:// and https:// are supported")
     req = urllib.request.Request(url, headers={"User-Agent": user_agent})
     ctx = ssl.create_default_context()
     try:
