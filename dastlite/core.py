@@ -171,7 +171,7 @@ def _check_cache_sensitive(t: Target) -> list:
 _INFO_PATTERNS = [
     (re.compile(r"-----BEGIN (?:RSA |EC )?PRIVATE KEY-----"), "Private key material in response body."),
     (re.compile(r"AKIA[0-9A-Z]{16}"), "AWS access key id in response body."),
-    (re.compile(r"(?i)\b(stack trace|traceback \(most recent call last\))\b"), "Stack trace / debug output in response body."),
+    (re.compile(r"(?i)(stack trace|traceback \(most recent call last\))"), "Stack trace / debug output in response body."),
     (re.compile(r"(?i)<title>\s*(?:exception|error)\b"), "Error page leaks exception details."),
     (re.compile(r"(?i)\b(sql syntax|you have an error in your sql)\b"), "SQL error message in response body."),
 ]
@@ -200,6 +200,38 @@ def _check_mixed_content(t: Target) -> list:
     return []
 
 
+def _check_cors_wildcard(t: Target) -> list:
+    """A wildcard ACAO combined with credentials is a misconfiguration."""
+    acao = t.header("Access-Control-Allow-Origin")
+    if acao is None:
+        return []
+    findings = []
+    if acao.strip() == "*":
+        acac = (t.header("Access-Control-Allow-Credentials") or "").lower()
+        if acac == "true":
+            findings.append(("CORS allows any origin (*) WITH credentials — a serious misconfiguration.", acao))
+        else:
+            findings.append(("CORS Access-Control-Allow-Origin is wildcard (*).", acao))
+    return findings
+
+
+def _check_permissions_policy(t: Target) -> list:
+    if t.header("Permissions-Policy") is None and t.header("Feature-Policy") is None:
+        return [("No Permissions-Policy header (powerful features are not restricted).", "")]
+    return []
+
+
+def _check_clear_text_form(t: Target) -> list:
+    """A password field posting over http:// leaks credentials in clear text."""
+    body = t.body or ""
+    if not re.search(r'<input[^>]+type\s*=\s*["\']?password', body, re.I):
+        return []
+    m = re.search(r'<form[^>]+action\s*=\s*["\']http://[^"\']+', body, re.I)
+    if m:
+        return [("Password form submits over plain http:// (clear-text credentials).", m.group(0)[:80])]
+    return []
+
+
 # Registry: each entry is (rule_id, level, title, fn)
 PASSIVE_CHECKS: list = [
     ("missing-csp", "warning", "Missing Content-Security-Policy",
@@ -217,6 +249,9 @@ PASSIVE_CHECKS: list = [
     ("cacheable-secret", "warning", "Cacheable response with cookie", _check_cache_sensitive),
     ("info-disclosure", "error", "Sensitive information disclosure", _check_info_disclosure),
     ("mixed-content", "warning", "Mixed active content", _check_mixed_content),
+    ("cors-wildcard", "warning", "Permissive CORS policy", _check_cors_wildcard),
+    ("missing-permissions-policy", "note", "Missing Permissions-Policy", _check_permissions_policy),
+    ("clear-text-form", "error", "Credentials submitted over clear text", _check_clear_text_form),
 ]
 
 
@@ -240,6 +275,80 @@ def run_passive_checks(target: Target, checks: Optional[Iterable] = None) -> lis
 def scan_response(url: str, status: int, headers: dict, body: str = "") -> list:
     """Convenience wrapper: build a Target and run all passive checks."""
     return run_passive_checks(Target(url=url, status=status, headers=dict(headers), body=body))
+
+
+def target_from_record(rec: dict) -> Target:
+    """Build a Target from a captured-response dict (offline, no network).
+
+    Accepts the demo capture shape: ``{url,status,headers,body}``. ``headers``
+    may be a dict or a list of ``[name, value]`` / ``{"name","value"}`` pairs
+    (as produced by HAR-style captures).
+    """
+    headers = rec.get("headers", {})
+    if isinstance(headers, list):
+        norm = {}
+        for h in headers:
+            if isinstance(h, dict) and "name" in h:
+                norm[str(h["name"])] = str(h.get("value", ""))
+            elif isinstance(h, (list, tuple)) and len(h) >= 2:
+                norm[str(h[0])] = str(h[1])
+        headers = norm
+    return Target(
+        url=str(rec.get("url", "")),
+        status=int(rec.get("status", 0) or 0),
+        headers=dict(headers or {}),
+        body=str(rec.get("body", "") or ""),
+        error=rec.get("error"),
+    )
+
+
+def _iter_records(data) -> list:
+    """Normalize loaded JSON into a list of capture records."""
+    if isinstance(data, dict):
+        for key in ("responses", "captures", "targets", "entries"):
+            if isinstance(data.get(key), list):
+                return data[key]
+        # HAR file: log.entries[*].{request.url, response.{status,headers,content.text}}
+        if isinstance(data.get("log"), dict) and isinstance(data["log"].get("entries"), list):
+            recs = []
+            for e in data["log"]["entries"]:
+                req = e.get("request", {})
+                resp = e.get("response", {})
+                recs.append({
+                    "url": req.get("url", ""),
+                    "status": resp.get("status", 0),
+                    "headers": resp.get("headers", []),
+                    "body": (resp.get("content", {}) or {}).get("text", ""),
+                })
+            return recs
+        return [data]
+    if isinstance(data, list):
+        return data
+    return []
+
+
+def scan_input(data) -> ScanResult:
+    """Passive offline scan of one or more captured responses (no network).
+
+    ``data`` is already-parsed JSON (dict/list) in the demo capture shape or a
+    HAR document. Returns a fully-populated ScanResult.
+    """
+    result = ScanResult()
+    for rec in _iter_records(data):
+        if not isinstance(rec, dict):
+            continue
+        target = target_from_record(rec)
+        result.targets.append(target)
+        result.findings.extend(run_passive_checks(target))
+    result.findings.sort(key=lambda f: (-severity_rank(f.level), f.url, f.rule_id))
+    return result
+
+
+def scan_input_file(path: str) -> ScanResult:
+    """Load a JSON capture file and run a passive offline scan."""
+    with open(path, "r", encoding="utf-8") as fh:
+        data = json.load(fh)
+    return scan_input(data)
 
 
 # --------------------------------------------------------------------------
@@ -309,7 +418,15 @@ def _rule_descriptors() -> list:
             "defaultConfiguration": {"level": level},
         })
     # synthetic rules emitted at runtime
-    for rid, title in (("request-failed", "Request failed"), ("check-error", "Check error")):
+    for rid, title in (("request-failed", "Request failed"), ("check-error", "Check error"),
+                       ("skipped-out-of-scope", "Skipped: out of authorized scope"),
+                       ("xst-trace", "Cross-site tracing (TRACE)"),
+                       ("exposed-git", "Exposed VCS metadata"),
+                       ("exposed-dotenv", "Exposed environment file"),
+                       ("exposed-robots", "robots.txt reachable"),
+                       ("exposed-server-status", "Exposed server-status"),
+                       ("exposed-ds-store", "Exposed .DS_Store"),
+                       ("exposed-backup", "Exposed backup archive")):
         rules.append({"id": rid, "name": title,
                       "shortDescription": {"text": title}})
     return rules

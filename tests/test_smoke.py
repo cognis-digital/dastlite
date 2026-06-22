@@ -57,6 +57,7 @@ def test_clean_response_has_no_findings():
         "X-Frame-Options": "DENY",
         "Referrer-Policy": "no-referrer",
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Permissions-Policy": "geolocation=(), microphone=()",
     }
     findings = run_passive_checks(
         Target(url="https://secure.example/api", status=200, headers=headers, body="{}")

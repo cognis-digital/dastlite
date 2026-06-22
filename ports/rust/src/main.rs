@@ -1,22 +1,29 @@
-// Rust port of the Cognis scan logic — fast, single binary.
-use std::{env, fs, path::Path};
-fn walk(p: &Path, out: &mut Vec<String>) {
-    if p.is_dir() {
-        if let Ok(rd) = fs::read_dir(p) { for e in rd.flatten() { walk(&e.path(), out); } }
-    } else if let Some(s) = p.to_str() { out.push(s.to_string()); }
-}
+// Rust port of dastlite (PASSIVE core) — CLI entrypoint.
+use serde_json::Value;
+use std::{env, fs, process};
+
 fn main() {
-    let target = env::args().nth(1).unwrap_or_else(|| ".".into());
-    let rules = [("GEN-001","high","TODO"),("GEN-002","medium","FIXME"),("GEN-003","low","XXX")];
-    let mut files = Vec::new();
-    walk(Path::new(&target), &mut files);
-    let mut n = 0;
-    for f in &files {
-        if let Ok(t) = fs::read_to_string(f) {
-            for (id, sev, needle) in rules.iter() {
-                if t.contains(needle) { println!("{} {} {}", id, sev, f); n += 1; }
-            }
+    let path = match env::args().nth(1) {
+        Some(p) => p,
+        None => {
+            eprintln!("usage: dastlite <capture.json>");
+            process::exit(2);
         }
-    }
-    println!("{{\"tool\":\"dastlite\",\"score\":{}}}", n);
+    };
+    let raw = match fs::read_to_string(&path) {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("{}", e);
+            process::exit(2);
+        }
+    };
+    let data: Value = match serde_json::from_str(&raw) {
+        Ok(v) => v,
+        Err(e) => {
+            eprintln!("invalid JSON: {}", e);
+            process::exit(2);
+        }
+    };
+    let out = dastlite::scan_input(&data);
+    println!("{}", serde_json::to_string_pretty(&out).unwrap());
 }

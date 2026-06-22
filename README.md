@@ -17,37 +17,63 @@
 
 ```bash
 pip install cognis-dastlite
-dastlite scan .            # → prioritized findings in seconds
+dastlite scan https://your-app.example   # → prioritized passive findings in seconds
 ```
 
-## Usage — step by step
+## Passive (default) vs Active (authorized-use only)
 
-1. **Install** the scanner:
+`dastlite` has two scanning postures. **Passive is the safe default.**
 
-   ```bash
-   pip install cognis-dastlite
-   ```
+| Mode | Command | Network | Default |
+|---|---|---|---|
+| **Passive — offline** | `dastlite scan-input capture.json` | none | ✅ safest |
+| **Passive — live** | `dastlite scan https://app` | one GET per URL | ✅ on |
+| **Active — gated** | `dastlite active https://app --authorized --scope app --rate-limit 2` | extra read-only probes | ⛔ OFF by default |
 
-2. **Scan URLs** directly, or feed a targets file (one URL per line, `#` comments allowed):
+### Passive mode
 
-   ```bash
-   dastlite scan https://example.com https://example.org
-   dastlite scan --targets urls.txt
-   ```
+Passive mode only **analyzes responses** — it never probes. Either feed it a
+captured response file (fully offline, ideal for CI on artifacts/HAR exports):
 
-3. **Emit SARIF** for GitHub code scanning, or JSON for `jq`:
+```bash
+dastlite scan-input capture.json --format sarif -o results.sarif   # offline
+```
 
-   ```bash
-   dastlite scan --targets urls.txt --format sarif -o results.sarif
-   ```
+…or let it fetch each URL once and inspect what comes back:
 
-4. **Read the result.** The table lists each finding's level (error/warning/note), rule, URL, and evidence, plus a per-target summary. `--fail-on {error,warning,note,never}` controls the gate; exit `0` = clean, `1` = findings at/above threshold, `2` = input error.
+```bash
+dastlite scan https://example.com https://example.org
+dastlite scan --targets urls.txt --fail-on warning --format sarif -o out.sarif
+```
 
-5. **Gate a PR.** Fail the build on warnings or worse:
+It flags missing/weak security headers (CSP, HSTS, X-Frame-Options,
+Referrer-Policy, Permissions-Policy), insecure cookie flags, permissive CORS,
+mixed content, clear-text credential forms, verbose banners, and
+information-disclosure (stack traces, SQL errors, leaked keys).
 
-   ```bash
-   dastlite scan --targets urls.txt --fail-on warning --format sarif -o out.sarif
-   ```
+### Active mode — ⚠️ AUTHORIZED USE ONLY
+
+> **Active scanning sends real requests to a live target.** It is **OFF by
+> default** and will refuse to run unless you (1) pass `--authorized` to attest
+> you have explicit written permission, (2) supply a non-empty `--scope` /
+> `--target-allowlist`, and (3) set a positive `--rate-limit`. Anything not in
+> scope is **skipped, never probed**. There are **no exploit payloads** — active
+> probes are benign read-only GETs (e.g. is `/.env` or `/.git/HEAD` publicly
+> reachable, does the server honor `TRACE`). Scanning systems you do not own or
+> are not authorized to test may be illegal.
+
+```bash
+dastlite active https://app.example.com \
+    --authorized \
+    --scope app.example.com \
+    --rate-limit 2 \
+    --format sarif -o active.sarif
+```
+
+A loud authorized-use banner is printed to stderr whenever active mode engages.
+
+`--fail-on {error,warning,note,never}` controls the CI gate in every mode;
+exit `0` = clean, `1` = findings at/above threshold, `2` = usage / authorization error.
 
 ## Contents
 
@@ -65,15 +91,12 @@ ZAP's automation is YAML-heavy and JVM-bound; dastlite is a Go single-binary 'ZA
 <a name="features"></a>
 ## Features
 
-- ✅ Severity Rank
-- ✅ Run Passive Checks
-- ✅ Scan Response
-- ✅ Fetch
-- ✅ Scan Targets
-- ✅ To Sarif
-- ✅ To Json
+- ✅ **Passive checks** (default): security headers, HSTS, cookie flags, CORS, mixed content, clear-text forms, info-disclosure
+- ✅ **Offline `scan-input`** mode — analyze captured responses / HAR with zero network
+- ✅ **Authorization-gated active mode** — off by default, scope-enforced, rate-limited, no exploit payloads
+- ✅ SARIF 2.1.0 + JSON + table output; CI exit-code gating (`--fail-on`)
 - ✅ Runs on Linux/macOS/Windows · Docker · devcontainer
-- ✅ Ports in Python, JavaScript, Go, and Rust (`ports/`)
+- ✅ Ports in Python, JavaScript, TypeScript, Go, and Rust (`ports/`) — Go/Rust verified in CI
 
 <div align="right"><a href="#top">↑ back to top</a></div>
 
@@ -83,9 +106,9 @@ ZAP's automation is YAML-heavy and JVM-bound; dastlite is a Go single-binary 'ZA
 ```bash
 pip install cognis-dastlite
 dastlite --version
-dastlite scan .                       # scan current project
-dastlite scan . --format json         # machine-readable
-dastlite scan . --fail-on high        # CI gate (non-zero exit)
+dastlite scan https://example.com              # passive live scan
+dastlite scan-input capture.json --format json # passive OFFLINE scan
+dastlite scan --targets urls.txt --fail-on warning   # CI gate (non-zero exit)
 ```
 
 <div align="right"><a href="#top">↑ back to top</a></div>
@@ -135,7 +158,7 @@ flowchart LR
 | Single command, zero config | ✅ | ⚠️ |
 | JSON + SARIF for CI | ✅ | varies |
 | MCP-native (AI agents) | ✅ | ❌ |
-| Polyglot ports (JS/Go/Rust) | ✅ | ❌ |
+| Polyglot ports (JS/TS/Go/Rust) | ✅ | ❌ |
 | Open license | ✅ COCL | varies |
 
 *Built in the spirit of **OWASP ZAP automation framework, distilled to a single binary**, re-framed the Cognis way. Missing a credit? Open a PR.*

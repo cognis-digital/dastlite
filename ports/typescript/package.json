@@ -1,0 +1,16 @@
+{
+  "name": "@cognis/dastlite-ts",
+  "version": "0.1.0",
+  "description": "TypeScript port of dastlite (Cognis Neural Suite)",
+  "license": "LicenseRef-COCL-1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "tsc -p tsconfig.json --noEmit && node --import tsx --test test/*.test.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "tsx": "^4.7.0",
+    "@types/node": "^20.0.0"
+  }
+}
