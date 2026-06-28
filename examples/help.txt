@@ -1,0 +1,16 @@
+$ dastlite-emit --help
+
+usage: dastlite [-h] [--version] {scan,scan-input,active} ...
+
+Config-as-code baseline DAST. PASSIVE by default; an authorization-gated ACTIVE mode is available for owners.
+
+positional arguments:
+  {scan,scan-input,active}
+    scan                PASSIVE live scan of URLs.
+    scan-input          PASSIVE offline scan of a capture file (no network).
+    active              ACTIVE scan (AUTHORIZED USE ONLY) — off by default,
+                        scope + rate-limit required.
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit

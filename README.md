@@ -20,6 +20,80 @@ pip install cognis-dastlite
 dastlite scan https://your-app.example   # → prioritized passive findings in seconds
 ```
 
+
+<!-- cognis:example:start -->
+## 🔎 Example output
+
+Real, reproducible output from the tool — runs offline:
+
+```console
+$ dastlite-emit --version
+dastlite 1.0.0
+```
+
+```console
+$ dastlite-emit --help
+usage: dastlite [-h] [--version] {scan,scan-input,active} ...
+
+Config-as-code baseline DAST. PASSIVE by default; an authorization-gated ACTIVE mode is available for owners.
+
+positional arguments:
+  {scan,scan-input,active}
+    scan                PASSIVE live scan of URLs.
+    scan-input          PASSIVE offline scan of a capture file (no network).
+    active              ACTIVE scan (AUTHORIZED USE ONLY) — off by default,
+                        scope + rate-limit required.
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+```
+
+> Blocks above are real `dastlite` output — reproduce them from a clone.
+
+**Sample result format** _(illustrative values — run on your own data for real findings):_
+
+```
+{
+  "results": [
+    {
+      "id": "123456",
+      "title": "Vulnerable Web App",
+      "description": "A web app is vulnerable to a SQL injection attack.",
+      "severity": "high",
+      "tags": ["sql-injection", "web-app"],
+      "findings": [
+        {
+          "id": "1",
+          "type": "vulnerability",
+          "name": "SQL Injection",
+          "description": "A SQL injection vulnerability exists in the web app.",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": "789012",
+      "title": "Misconfigured Server",
+      "description": "A server is misconfigured, allowing unauthorized access.",
+      "severity": "medium",
+      "tags": ["misconfiguration", "server"],
+      "findings": [
+        {
+          "id": "2",
+          "type": "vulnerability",
+          "name": "Unsecured Server",
+          "description": "A server is not properly secured, allowing unauthorized access.",
+          "severity": "medium"
+        }
+      ]
+    }
+  ]
+}
+```
+
+<!-- cognis:example:end -->
+
 ## Passive (default) vs Active (authorized-use only)
 
 `dastlite` has two scanning postures. **Passive is the safe default.**

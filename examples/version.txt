@@ -1,0 +1,3 @@
+$ dastlite-emit --version
+
+dastlite 1.0.0
