@@ -1,0 +1,19 @@
+[2026-08-18 08:02:49] === enhance · dastlite · words=120000 loc>=10000 langs=9 push=True ===
+[2026-08-18 08:02:55] phase DOCS — longform 120000-word corpus -> docs/corpus/
+[2026-08-18 17:46:15] phase POLYGLOT — expanding to >= 10000 LOC across 9 languages
+[2026-08-18 17:46:55]   facets: ['config_parser', 'target_manager', 'auth_handler', 'crawler', 'rule_engine', 'sarif_writer']
+[2026-08-18 17:49:39]   +polyglot/python/config_parser.py  (loc now ~3471)
+[2026-08-18 17:53:09]   +polyglot/go/config_parser.go  (loc now ~3937)
+[2026-08-18 17:57:01]   +polyglot/rust/config_parser.rs  (loc now ~4445)
+[2026-08-18 17:59:56]   +polyglot/typescript/config_parser.ts  (loc now ~4797)
+[2026-08-18 18:03:29]   +polyglot/c/config_parser.c  (loc now ~5306)
+[2026-08-18 18:07:19]   +polyglot/cpp/config_parser.cpp  (loc now ~5751)
+[2026-08-18 18:11:04]   +polyglot/java/config_parser.java  (loc now ~6207)
+[2026-08-18 18:13:55]   +polyglot/ruby/config_parser.rb  (loc now ~6539)
+[2026-08-18 18:17:27]   +polyglot/csharp/config_parser.cs  (loc now ~7042)
+[2026-08-18 18:21:16]   +polyglot/python/target_manager.py  (loc now ~7545)
+[2026-08-18 18:25:06]   +polyglot/go/target_manager.go  (loc now ~8078)
+[2026-08-18 18:28:38]   +polyglot/rust/target_manager.rs  (loc now ~8585)
+[2026-08-18 18:32:33]   +polyglot/typescript/target_manager.ts  (loc now ~9110)
+[2026-08-18 18:36:28]   +polyglot/c/target_manager.c  (loc now ~9553)
+[2026-08-18 18:40:16]   +polyglot/cpp/target_manager.cpp  (loc now ~10037)
