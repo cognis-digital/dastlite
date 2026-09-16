@@ -17,3 +17,8 @@
 [2026-08-18 18:32:33]   +polyglot/typescript/target_manager.ts  (loc now ~9110)
 [2026-08-18 18:36:28]   +polyglot/c/target_manager.c  (loc now ~9553)
 [2026-08-18 18:40:16]   +polyglot/cpp/target_manager.cpp  (loc now ~10037)
+[2026-08-18 18:40:21] === done · dastlite · loc=10037 · {'committed': True, 'pushed': True, 'push_err': ''} ===
+[2026-09-15 23:52:40] === enhance · dastlite · words=120000 loc>=10000 langs=9 push=True ===
+[2026-09-15 23:52:45] phase DOCS — longform 120000-word corpus -> docs/corpus/
+[2026-09-16 02:22:26] phase POLYGLOT — expanding to >= 10000 LOC across 9 languages
+[2026-09-16 02:22:55]   facets: ['config_parser', 'auth_handler', 'api_crawler', 'rules_engine', 'finding_aggregator', 'sarif_writer']
